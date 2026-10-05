@@ -33,7 +33,7 @@ const defaults={
     {id:"seed-nirvana",type:"placeholder",label:"Nirvana",emoji:"🦉"},
     {id:"seed-wand",type:"placeholder",label:"Wand",emoji:"🪄"}
   ],
-  log:["Test sandbox loaded."],
+  log:["A new RPG save is ready."],
   unread:{Harry:1,Mum:1,Dad:0,Family:1},
   messages:{
     Harry:[{from:"them",text:"you packed yet or are you leaving it till tomorrow 😭",time:"20:09"}],
@@ -684,6 +684,13 @@ function openPhoneApp(app){
   if(app==="social"&&state.campaignPosts){
     state.campaignPosts.slice(0,15).forEach(post=>{const d=document.createElement("div");d.className="card2 block-gap";d.textContent="@maisie · "+post.text;view.appendChild(d);});
   }
+  if(app==="contacts"){
+    const list=view.querySelector(".grid");
+    Object.keys(state.messages).filter(n=>!["Harry","Mum","Dad","Family"].includes(n)).forEach(name=>{
+      const b=document.createElement("button");b.className="chatrow quickChat";b.dataset.name=name;
+      b.textContent=name;list.appendChild(b);
+    });
+  }
   const statsButton=view.querySelector("[data-open-stats]");
   if(statsButton)statsButton.addEventListener("click",()=>showScreen("maisie"));
   $("#phoneBack").addEventListener("click",backToPhoneHome);
@@ -737,6 +744,7 @@ $("[data-action='phone']").addEventListener("click",()=>{
   addLog("Checked her phone.");
 });
 $("[data-action='nirvana']").addEventListener("click",()=>{
+  if(state.campaignActive&&!state.inventory.some(i=>i.name==="Nirvana’s carrier")){toast("Meet Nirvana in Diagon Alley first.");return;}
   state.mood="Calmer";
   changeRel("Nirvana",2);
   addLog("Talked to Nirvana.");
@@ -772,6 +780,7 @@ $("#customForm").addEventListener("submit",e=>{
 });
 
 $$(".outfitBtn").forEach(b=>b.addEventListener("click",()=>{
+  if(state.campaignActive&&b.dataset.outfit==="Robes"&&!state.inventory.some(i=>i.id==="robes")){toast("Get your Hogwarts robes in Diagon Alley first.");return;}
   state.outfit=b.dataset.outfit;
   completeTask("outfit");
   addLog("Changed outfit to "+state.outfit+".");

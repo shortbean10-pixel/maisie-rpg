@@ -27,13 +27,6 @@ Included:
 - installable PWA/service worker
 
 Build 0.9:
-- Separate Story view opens by default; Hub keeps the phone, bag and free-time tools.
-- Playable packing-night chapter with branching dialogue.
-- Three untimed optional mini games: packing, owl care and matching pairs.
-- Chapter progress saves on this device, with replay and one-time hub rewards.
-- Existing v0.7 hub saves are preserved.
-
-Build 0.9:
 - New RPG starts with the Hogwarts letter; earlier story continuity is reset.
 - Journey through Diagon Alley, wand/packing games, train, boats and Sorting.
 - Repeatable school days: lessons, spell practice, study, friends, meals, exploring, owl care, rest and sleep.

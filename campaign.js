@@ -3,6 +3,7 @@
 const E=window.CampaignEngine,key="maisieCampaign09",root=document.querySelector("#rpgContent");
 let s=E.fresh(),view="story",storageOK=true,needsReset=true;
 try{const old=JSON.parse(localStorage.getItem(key));if(old?.version===9){s={...s,...old};needsReset=false;}}catch{}
+if(s.intro<4)s.relations.Nirvana=null;
 const esc=t=>String(t).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const btn=(action,label,value="",extra="")=>`<button class="choice" data-campaign="${action}" data-value="${esc(value)}" ${extra}>${label}</button>`;
 const choices=html=>`<div class="story-choices">${html}</div>`;
@@ -16,7 +17,7 @@ function sync(reset=false){document.dispatchEvent(new CustomEvent("campaign-sync
  {id:"friend",label:"Spend time with someone",done:s.daily.includes("friends")},
  {id:"discover",label:"Explore or study",done:s.daily.some(x=>["study","explore"].includes(x))}
  ]:[{id:"letter",label:"Read your Hogwarts letter",done:s.intro>0},{id:"supplies",label:"Get your school supplies",done:s.intro>=4},{id:"arrival",label:"Get to Hogwarts",done:s.day>0}]}}));}
-function statsHTML(){return `<h2>My Stats</h2><p class="small muted">Maisie · Age 11 · First year · Human · Half-blood<br>${esc(s.house)} · Level ${1+Math.floor(s.xp/100)} · ${s.xp} XP</p>${bar("Energy",s.energy)}${bar("Mood",s.mood)}${bar("Phone battery",s.battery)}<h3>Skills</h3>${Object.entries(s.skills).map(([n,v])=>progress(n,v)).join("")}<h3>Spells</h3>${Object.entries(s.spells).map(([n,v])=>progress(n,v)).join("")}<p class="small muted">Lumos: ${s.spells.Lumos===0?"Not learned yet":s.spells.Lumos<100?"A first light; building steadiness":"Working towards longer, reliable light"}.<br>Leviosa: ${s.spells.Leviosa===0?"Not learned yet":s.spells.Leviosa<100?"Early lifts; building control":"Working towards consistent control"}.</p><h3>Belongings</h3><p class="small">${s.inventory.map(esc).join(" · ")}</p><p class="small muted">Blackthorn wand: dragon heartstring, 11 inches, supple.</p><h3>Journal</h3>${s.history.slice(0,15).map(x=>`<p class="small">Day ${x.day} · ${x.time} — ${esc(x.text)}</p>`).join("")||'<p class="small muted">Your new story starts with the letter.</p>'}`;}
+function statsHTML(){return `<h2>My Stats</h2><p class="small muted">Maisie · Age 11 · First year · Human · Half-blood<br>${esc(s.house)} · Level ${1+Math.floor(s.xp/100)} · ${s.xp} XP</p>${bar("Energy",s.energy)}${bar("Mood",s.mood)}${bar("Phone battery",s.battery)}<h3>Skills</h3>${Object.entries(s.skills).map(([n,v])=>progress(n,v)).join("")}<h3>Spells</h3>${Object.entries(s.spells).map(([n,v])=>progress(n,v)).join("")}<p class="small muted">Lumos: ${s.spells.Lumos===0?"Not learned yet":s.spells.Lumos<100?"A first light; building steadiness":"Working towards longer, reliable light"}.<br>Leviosa: ${s.spells.Leviosa===0?"Not learned yet":s.spells.Leviosa<100?"Early lifts; building control":"Working towards consistent control"}.</p><h3>Belongings</h3><p class="small">${s.inventory.map(esc).join(" · ")}</p>${s.inventory.includes("Blackthorn wand")?'<p class="small muted">Blackthorn wand: dragon heartstring, 11 inches, supple.</p>':""}<h3>Journal</h3>${s.history.slice(0,15).map(x=>`<p class="small">Day ${x.day} · ${x.time} — ${esc(x.text)}</p>`).join("")||'<p class="small muted">Your new story starts with the letter.</p>'}`;}
 function relationshipsHTML(){return Object.entries(s.relations).map(([name,n])=>`<details class="character-detail"><summary>${esc(name)} <span class="muted">${n===null?"Unknown":n<35?"Uneasy":n>65?"Warm":"Getting to know you"}</span></summary><div class="small muted">Dislike ← Neutral → Like</div><progress max="100" value="${n===null?50:n}" aria-label="${esc(name)} relationship"></progress><p class="small">${n===null?"Feeling unknown":n+"/100"}</p>${(s.facts[name]||[]).map(x=>`<p class="small">${esc(x)}</p>`).join("")||'<p class="small muted">No facts learned yet.</p>'}</details>`).join("");}
 function hub(){
  document.querySelector("#campaignHub").innerHTML=`<div class="section-head"><strong>Your RPG</strong><span class="badge">Build 0.9</span></div><p class="small muted">${esc(E.date(s))} · ${E.time(s)} · ${esc(E.locations[s.location])}</p><div class="action-grid">${btn("returnStory","Continue story")}${btn("arcadeMenu","Mini games · Play now")}${btn("statsView","My Stats · Skills and spells")}${btn("mapView","Explore · Places")}${btn("journalView","Nightly and weekly reviews")}</div>`;
@@ -83,7 +84,7 @@ document.addEventListener("click",e=>{
 });
 document.addEventListener("campaign-hub-change",e=>{
  const p=e.detail;s.energy=p.energy;s.battery=p.battery;
- if(s.day)s.minutes=Math.min(1439,p.minutes);
+ s.minutes=Math.min(1439,p.minutes);
  Object.keys(s.relations).forEach(n=>{if(p.relations[n]!=null)s.relations[n]=p.relations[n];});
  save();hub();
 });
