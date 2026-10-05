@@ -1,4 +1,4 @@
-Maisie Potter RPG — Build 0.8
+Maisie Potter RPG — Build 0.9
 
 This is a real static website/PWA build, not a single preview file.
 
@@ -26,9 +26,18 @@ Included:
 - local save data
 - installable PWA/service worker
 
-Build 0.8:
+Build 0.9:
 - Separate Story view opens by default; Hub keeps the phone, bag and free-time tools.
 - Playable packing-night chapter with branching dialogue.
 - Three untimed optional mini games: packing, owl care and matching pairs.
 - Chapter progress saves on this device, with replay and one-time hub rewards.
 - Existing v0.7 hub saves are preserved.
+
+Build 0.9:
+- New RPG starts with the Hogwarts letter; earlier story continuity is reset.
+- Journey through Diagon Alley, wand/packing games, train, boats and Sorting.
+- Repeatable school days: lessons, spell practice, study, friends, meals, exploring, owl care, rest and sleep.
+- Mini games are directly accessible in the Hub and Story toolbar.
+- Typed commands support the built-in activities; written dialogue branches do not use an AI service.
+- Milestone stats, XP, relationships, journal, nightly and weekly check-ins.
+- Progress saves locally in maisieCampaign09; phone data/photos use the existing local app storage.

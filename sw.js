@@ -1,6 +1,6 @@
 
-const CACHE="maisie-rpg-v08";
-const FILES=["./","./index.html","./styles.css","./app.js","./story.js","./manifest.webmanifest","./icon.svg"];
+const CACHE="maisie-rpg-v09";
+const FILES=["./","./index.html","./styles.css","./app.js","./story.js","./campaign-engine.js","./campaign.js","./manifest.webmanifest","./icon.svg"];
 self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES)).then(()=>self.skipWaiting())));
 self.addEventListener("activate",e=>e.waitUntil(
   caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())

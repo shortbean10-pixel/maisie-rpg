@@ -53,6 +53,7 @@ let state=loadState();
 let activeStream=null;
 let currentChat=null;
 let replyTimer=null;
+let syncingCampaign=false;
 
 function loadState(){
   try{
@@ -99,7 +100,8 @@ function addLog(text){
   renderLog();
 }
 function showScreen(id){
-  document.body.classList.toggle("story-mode",id==="story");
+  document.dispatchEvent(new CustomEvent("game-screen",{detail:{id}}));
+  document.body.classList.toggle("story-mode",id==="story"||id==="rpg");
   stopCamera();
   $$(".screen").forEach(s=>s.classList.toggle("active",s.id===id));
   $$(".navbtn").forEach(b=>b.classList.toggle("active",b.dataset.screen===id));
@@ -110,6 +112,7 @@ function completeTask(id){
   if(t)t.done=true;
 }
 function changeRel(name,delta){
+  if(state.relationships[name]===null)state.relationships[name]=50;
   if(state.relationships[name]!=null){
     state.relationships[name]=clamp(state.relationships[name]+delta,0,100);
   }
@@ -229,6 +232,7 @@ function renderAll(){
   renderInventory();
   renderRelationships();
   save();
+  if(state.campaignActive&&!syncingCampaign)document.dispatchEvent(new CustomEvent("campaign-hub-change",{detail:{energy:state.energy,battery:state.battery,minutes:state.minutes,relations:state.relationships}}));
 }
 
 function togglePack(id){
@@ -386,6 +390,14 @@ function queueReply(name,text){
 }
 function generateReply(name,text){
   const t=text.toLowerCase();
+  if(state.campaignActive){
+    if(name==="Draco")return /photo|selfie/.test(t)?"send it over then. the one where my hair looks normal":"tell me when you’re free. i’m heading to class";
+    if(name==="Hermione")return /spell|class|homework/.test(t)?"Try one step at a time. I can help you practise later.":"I’ll be in the library after class.";
+    if(name==="Ron")return /food|lunch|dinner/.test(t)?"great hall? i’m starving":"see you after lessons then";
+    if(name==="Harry")return /nervous|scared|worried/.test(t)?"one thing at a time. you can text me":"meet me in the common room later?";
+    if(name==="Mum")return "Hope school’s going well lovely. Tell us about your day x";
+    if(name==="Dad")return "Good to hear from you. How are the lessons going? 👍";
+  }
 
   if(name==="Harry"){
     if(t.includes("packed"))return state.packed.length>=3?"wait you actually packed??":"that's not packed, that's one thing 😭";
@@ -588,6 +600,7 @@ function setupCameraUI(){
 }
 
 function openPhoneApp(app){
+  if(app==="stats"){showScreen("maisie");return;}
   stopCamera();
   const home=$("#phoneHome");
   const view=$("#phoneView");
@@ -662,13 +675,24 @@ function openPhoneApp(app){
       <div class="switchRow"><span>Notifications</span><button class="toggle ${state.settings.notifications?'on':''}" data-setting="notifications"><span></span></button></div>
       <div class="switchRow"><span>Show relationship numbers</span><button class="toggle ${state.settings.showRelationshipNumbers?'on':''}" data-setting="showRelationshipNumbers"><span></span></button></div>
       <div class="switchRow"><span>Sound effects</span><button class="toggle ${state.settings.sound?'on':''}" data-setting="sound"><span></span></button></div>
-      <div class="small muted" style="margin-top:10px">Story: Packing night • Build 0.8</div>
+      <button class="mini" data-open-stats style="margin-top:10px">My Stats</button>
+      <div class="small muted" style="margin-top:10px">Story: Day-by-day • Build 0.9</div>
     </div>`;
   }
 
   view.innerHTML=html;
+  if(app==="social"&&state.campaignPosts){
+    state.campaignPosts.slice(0,15).forEach(post=>{const d=document.createElement("div");d.className="card2 block-gap";d.textContent="@maisie · "+post.text;view.appendChild(d);});
+  }
+  const statsButton=view.querySelector("[data-open-stats]");
+  if(statsButton)statsButton.addEventListener("click",()=>showScreen("maisie"));
   $("#phoneBack").addEventListener("click",backToPhoneHome);
 
+  if(app==="calendar"&&state.campaignActive){
+    const card=view.querySelector(".card2");card.textContent="";
+    const title=document.createElement("strong");title.textContent="Calendar · "+state.date;card.appendChild(title);
+    const note=document.createElement("p");note.className="small";note.textContent="Your next activity is yours to choose. Lessons, practice and rest advance time; sleep starts the next day.";card.appendChild(note);
+  }
   if(app==="messages"){
     renderChatList();
   }else if(app==="camera"){
@@ -688,7 +712,10 @@ function openPhoneApp(app){
     $("#fakePost").addEventListener("click",()=>{
       const text=prompt("What does Maisie post?");
       if(text){
+        state.campaignPosts=state.campaignPosts||[];
+        state.campaignPosts.unshift({id:"hub-post-"+Date.now(),text:text.slice(0,180)});
         addLog("Posted a status: "+text);
+        openPhoneApp("social");
         toast("Posted.");
       }
     });
@@ -788,6 +815,35 @@ document.addEventListener("story-reward",e=>{
   if(kind==="memory")state.mood="Confident";
   addLog("Story: "+{packing:"packed the essentials.",owl:"settled Nirvana for the night.",memory:"finished Harry’s matching challenge."}[kind]);
   renderAll();
+});
+document.addEventListener("campaign-sync",e=>{
+  syncingCampaign=true;
+  const p=e.detail;
+  if(p.reset){state=clone(defaults);state.photos=state.photos.filter(x=>x.id!=="draco-selfie");state.packed=[];
+    state.messages={Harry:[{from:"them",text:"you got your letter! keep the school list",time:"09:56"}],Mum:[{from:"them",text:"Keep your supply list safe lovely x",time:"09:57"}],Dad:[{from:"them",text:"We’ll get everything you need 👍",time:"09:58"}],Family:[]};
+    state.unread={Harry:1,Mum:1,Dad:1,Family:0};
+  }
+  state.campaignActive=true;
+  state.relationships={...p.relations};
+  state.inventory=p.inventory.map((name,i)=>({id:({"Blackthorn wand":"wand","iPhone":"phone","Headphones":"headphones","Blue hoodie":"hoodie","First-year school books":"book","Hogwarts robes":"robes"}[name])||"campaign-"+i,name,detail:name==="Blackthorn wand"?"Dragon heartstring • 11 inches • supple":"Maisie’s belongings"}));
+  if(p.intro<3)state.photos=state.photos.filter(x=>x.id!=="seed-wand");
+  if(p.intro<4)state.photos=state.photos.filter(x=>x.id!=="seed-nirvana");
+  state.minutes=p.minutes;state.date=p.date;state.location=p.location;
+  state.energy=p.energy;state.mood=p.mood;state.battery=p.battery;
+  if(p.started)state.tasks=p.tasks.map(t=>({id:t.id,label:t.label,done:t.done}));
+  for(const name of p.contacts){
+    if(!state.messages[name])state.messages[name]=[];
+    if(state.unread[name]==null)state.unread[name]=0;
+  }
+  if(p.photo&&!state.photos.some(x=>x.id==="draco-selfie"))state.photos.push({id:"draco-selfie",type:"placeholder",emoji:"📱",label:"Blurry selfie · Maisie and Draco"});
+  if(p.post&&!state.campaignPostIds?.includes(p.post.id)){
+    state.campaignPostIds=state.campaignPostIds||[];state.campaignPostIds.push(p.post.id);
+    state.campaignPosts=state.campaignPosts||[];state.campaignPosts.unshift(p.post);
+  }
+  $("#knownSpells").textContent="Spells in practice: "+(p.spells.join(", ")||"None yet");
+  $("#houseLine").textContent="House: "+p.house;
+  renderAll();
+  syncingCampaign=false;
 });
 renderAll();
 })();

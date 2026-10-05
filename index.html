@@ -20,7 +20,7 @@
         <div class="tiny muted">MAISIE’S HUB</div>
         <div class="title">Maisie Potter RPG</div>
       </div>
-      <button class="mini" data-screen="story">Continue story</button>
+      <button class="mini" data-screen="rpg">Continue story</button>
     </div>
     <div class="row" style="margin-top:8px">
       <span class="pill" id="hudDate">31 August</span>
@@ -31,7 +31,11 @@
   </header>
 
   <main>
-    <section id="story" class="screen active" aria-label="Story">
+    <section id="rpg" class="screen active" aria-label="RPG story">
+      <div class="story-top"><span>✦ Maisie Potter</span><button class="mini" data-screen="play">Hub</button></div>
+      <div id="rpgContent"></div>
+    </section>
+    <section id="story" class="screen" aria-label="Story">
       <div class="story-top"><span>✦ Maisie Potter</span><button class="mini" data-screen="play">Hub</button></div>
       <div class="chapter-label">CHAPTER 0 · 31 AUGUST</div>
       <h1>The night before Hogwarts</h1>
@@ -39,6 +43,7 @@
       <p class="story-save" id="storySave" role="status">Progress saves on this device.</p>
     </section>
     <section id="play" class="screen">
+      <div id="campaignHub" class="panel block-gap"></div>
       <div class="panel">
         <div class="section-head">
           <div>
@@ -111,6 +116,7 @@
             <button class="appbtn" data-app="calendar"><span class="ico">📅</span>Calendar</button>
             <button class="appbtn" data-app="contacts"><span class="ico">👤</span>Contacts</button>
             <button class="appbtn" data-app="social"><span class="ico">🎵</span>Social</button>
+            <button class="appbtn" data-app="stats"><span class="ico">📊</span>My Stats</button>
             <button class="appbtn" data-app="settings"><span class="ico">⚙️</span>RPG</button>
           </div>
         </div>
@@ -133,7 +139,7 @@
       <div class="panel">
         <div class="scene-title">Relationships</div>
         <div class="small muted page-note">
-          Numbers are visible only in this test build so you can see that interactions really change them.
+          Open a character to see the facts Maisie has learned. Feelings develop through your choices.
         </div>
         <div id="relationshipList" class="grid"></div>
       </div>
@@ -142,7 +148,7 @@
     <section id="maisie" class="screen">
       <div class="panel">
         <div class="scene-title">Maisie Potter</div>
-        <div class="small muted">Age 11 • First Year • Packing night</div>
+        <div class="small muted">Age 11 • First Year • Human • Half-blood</div>
 
         <div class="card2 block-gap">
           <strong>Outfit</strong>
@@ -160,12 +166,13 @@
             <div>Mood: <span id="profileMood"></span></div>
             <div>Energy: <span id="profileEnergy"></span></div>
             <div>Current outfit: <span id="profileOutfit"></span></div>
-            <div>Known spells: 0</div>
-            <div>House: Not sorted yet</div>
+            <div id="knownSpells">Known spells: 0</div>
+            <div id="houseLine">House: Gryffindor</div>
           </div>
         </div>
 
-        <button class="action danger block-gap" id="resetGame">Reset this test build</button>
+        <div id="campaignStats" class="block-gap"></div>
+        <button class="action danger block-gap" id="resetGame">Reset hub progress</button>
       </div>
     </section>
   </main>
@@ -183,5 +190,7 @@
 
 <script src="app.js"></script>
 <script src="story.js"></script>
+<script src="campaign-engine.js"></script>
+<script src="campaign.js"></script>
 </body>
 </html>
