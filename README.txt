@@ -1,4 +1,4 @@
-Maisie Potter RPG — Build 0.7
+Maisie Potter RPG — Build 0.8
 
 This is a real static website/PWA build, not a single preview file.
 
@@ -25,3 +25,10 @@ Included:
 - notifications
 - local save data
 - installable PWA/service worker
+
+Build 0.8:
+- Separate Story view opens by default; Hub keeps the phone, bag and free-time tools.
+- Playable packing-night chapter with branching dialogue.
+- Three untimed optional mini games: packing, owl care and matching pairs.
+- Chapter progress saves on this device, with replay and one-time hub rewards.
+- Existing v0.7 hub saves are preserved.

@@ -99,6 +99,7 @@ function addLog(text){
   renderLog();
 }
 function showScreen(id){
+  document.body.classList.toggle("story-mode",id==="story");
   stopCamera();
   $$(".screen").forEach(s=>s.classList.toggle("active",s.id===id));
   $$(".navbtn").forEach(b=>b.classList.toggle("active",b.dataset.screen===id));
@@ -661,7 +662,7 @@ function openPhoneApp(app){
       <div class="switchRow"><span>Notifications</span><button class="toggle ${state.settings.notifications?'on':''}" data-setting="notifications"><span></span></button></div>
       <div class="switchRow"><span>Show relationship numbers</span><button class="toggle ${state.settings.showRelationshipNumbers?'on':''}" data-setting="showRelationshipNumbers"><span></span></button></div>
       <div class="switchRow"><span>Sound effects</span><button class="toggle ${state.settings.sound?'on':''}" data-setting="sound"><span></span></button></div>
-      <div class="small muted" style="margin-top:10px">Story: Paused • Pacing: Day-by-day • Build 0.7</div>
+      <div class="small muted" style="margin-top:10px">Story: Packing night • Build 0.8</div>
     </div>`;
   }
 
@@ -702,7 +703,7 @@ function openPhoneApp(app){
   }
 }
 
-$$(".navbtn").forEach(b=>b.addEventListener("click",()=>showScreen(b.dataset.screen)));
+$$("[data-screen]").forEach(b=>b.addEventListener("click",()=>showScreen(b.dataset.screen)));
 
 $("[data-action='phone']").addEventListener("click",()=>{
   showScreen("phone");
@@ -774,5 +775,19 @@ if("serviceWorker" in navigator && location.protocol.startsWith("http")){
   navigator.serviceWorker.register("sw.js").catch(()=>{});
 }
 
+document.addEventListener("story-reward",e=>{
+  const {id,kind}=e.detail;
+  state.storyRewards=state.storyRewards||[];
+  if(state.storyRewards.includes(id))return;
+  state.storyRewards.push(id);
+  if(kind==="packing"){
+    ["headphones","hoodie","book"].forEach(item=>{if(!state.packed.includes(item))state.packed.push(item)});
+    state.mood="Prepared";
+  }
+  if(kind==="owl"){changeRel("Nirvana",2);state.mood="Calmer";}
+  if(kind==="memory")state.mood="Confident";
+  addLog("Story: "+{packing:"packed the essentials.",owl:"settled Nirvana for the night.",memory:"finished Harry’s matching challenge."}[kind]);
+  renderAll();
+});
 renderAll();
 })();

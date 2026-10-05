@@ -138,3 +138,30 @@ textarea{min-height:130px;resize:vertical}
   .relrow{grid-template-columns:90px 1fr 38px}
   .app{padding-left:7px;padding-right:7px}
 }
+
+/* A quiet reading view, separate from the hub. */
+.story-mode .header,.story-mode .nav{display:none}
+.story-mode .app{max-width:680px;padding:16px 18px calc(28px + env(safe-area-inset-bottom))}
+#story{margin-top:0}
+.story-top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:4px 0 24px;color:var(--muted)}
+.story-top .mini{min-width:64px;text-align:center}
+.chapter-label{font-size:11px;letter-spacing:.16em;color:var(--accent)}
+#story h1{font-size:clamp(25px,6vw,36px);line-height:1.2;margin:12px 0 26px;letter-spacing:-.035em}
+.story-prose{line-height:1.85;font-size:17px;margin:20px 0}
+.dialogue{padding:18px 20px;border-left:3px solid var(--accent2);background:rgba(196,127,155,.07);border-radius:0 14px 14px 0;margin:20px 0;line-height:1.7}
+.dialogue strong{display:block;color:var(--accent2);font-size:12px;letter-spacing:.06em;margin-bottom:7px}
+.story-choices{display:grid;gap:10px;margin-top:24px}
+.story-choices button{min-height:54px;line-height:1.5}
+.story-save{color:var(--muted);font-size:12px;margin-top:26px;line-height:1.6}
+.story-game{border:1px solid var(--line);border-radius:18px;padding:18px;background:var(--panel);margin:24px 0}
+.story-game h2{font-size:18px;margin:0 0 8px}
+.story-game p{line-height:1.6;color:var(--muted);font-size:14px}
+.game-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:16px 0}
+.game-grid button{text-align:center;min-height:64px}
+.game-grid button.selected{border-color:var(--accent);background:rgba(138,162,213,.22)}
+.game-grid button.matched{border-color:var(--good);background:rgba(141,183,150,.15);opacity:.8}
+.game-feedback{min-height:24px;line-height:1.5;font-size:14px;color:var(--good)}
+.story-secondary{background:none;border:0;color:var(--muted);text-decoration:underline;min-height:48px;padding:10px 0;cursor:pointer}
+button:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+.story-mode .toast{bottom:20px}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}

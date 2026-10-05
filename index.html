@@ -12,15 +12,15 @@
   <link rel="icon" href="icon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="story-mode">
 <div class="app">
   <header class="header">
     <div class="row space">
       <div>
-        <div class="tiny muted">SANDBOX BUILD • STORY STILL PAUSED</div>
+        <div class="tiny muted">MAISIE’S HUB</div>
         <div class="title">Maisie Potter RPG</div>
       </div>
-      <span class="pill">Build 0.7</span>
+      <button class="mini" data-screen="story">Continue story</button>
     </div>
     <div class="row" style="margin-top:8px">
       <span class="pill" id="hudDate">31 August</span>
@@ -31,18 +31,25 @@
   </header>
 
   <main>
-    <section id="play" class="screen active">
+    <section id="story" class="screen active" aria-label="Story">
+      <div class="story-top"><span>✦ Maisie Potter</span><button class="mini" data-screen="play">Hub</button></div>
+      <div class="chapter-label">CHAPTER 0 · 31 AUGUST</div>
+      <h1>The night before Hogwarts</h1>
+      <div id="storyContent"></div>
+      <p class="story-save" id="storySave" role="status">Progress saves on this device.</p>
+    </section>
+    <section id="play" class="screen">
       <div class="panel">
         <div class="section-head">
           <div>
             <div class="tiny muted">CURRENT SCENE</div>
             <div class="scene-title">The night before Hogwarts</div>
           </div>
-          <span class="badge">Test sandbox</span>
+          <span class="badge">Free time</span>
         </div>
 
         <div class="story" id="sceneText">
-          Maisie's room is half-packed. Her Hogwarts trunk is open beside the bed, Nirvana is awake on her perch, and her phone keeps lighting up on the desk. Nothing in the actual story advances here — this is just the playable test area.
+          Maisie's room is half-packed. Her Hogwarts trunk is open beside the bed, Nirvana is awake on her perch, and her phone keeps lighting up on the desk. Use the hub for your phone, inventory and free-time actions. Continue story to return to the chapter.
         </div>
 
         <div class="statgrid">
@@ -135,7 +142,7 @@
     <section id="maisie" class="screen">
       <div class="panel">
         <div class="scene-title">Maisie Potter</div>
-        <div class="small muted">Age 11 • First Year • Story not started</div>
+        <div class="small muted">Age 11 • First Year • Packing night</div>
 
         <div class="card2 block-gap">
           <strong>Outfit</strong>
@@ -164,7 +171,7 @@
   </main>
 
   <nav class="nav" aria-label="Game navigation">
-    <button class="navbtn active" data-screen="play">Play</button>
+    <button class="navbtn active" data-screen="play">Hub</button>
     <button class="navbtn" data-screen="phone">Phone <span id="navUnread" class="navUnread hidden"></span></button>
     <button class="navbtn" data-screen="bag">Bag</button>
     <button class="navbtn" data-screen="people">People</button>
@@ -175,5 +182,6 @@
 <div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
 
 <script src="app.js"></script>
+<script src="story.js"></script>
 </body>
 </html>
