@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#18141f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Maisie RPG">
+  <title>Maisie Potter RPG</title>
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="app">
+  <header class="header">
+    <div class="row space">
+      <div>
+        <div class="tiny muted">SANDBOX BUILD • STORY STILL PAUSED</div>
+        <div class="title">Maisie Potter RPG</div>
+      </div>
+      <span class="pill">Build 0.7</span>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <span class="pill" id="hudDate">31 August</span>
+      <span class="pill" id="hudTime">20:14</span>
+      <span class="pill" id="hudLocation">Maisie's Bedroom</span>
+    </div>
+    <div id="notificationBar"></div>
+  </header>
+
+  <main>
+    <section id="play" class="screen active">
+      <div class="panel">
+        <div class="section-head">
+          <div>
+            <div class="tiny muted">CURRENT SCENE</div>
+            <div class="scene-title">The night before Hogwarts</div>
+          </div>
+          <span class="badge">Test sandbox</span>
+        </div>
+
+        <div class="story" id="sceneText">
+          Maisie's room is half-packed. Her Hogwarts trunk is open beside the bed, Nirvana is awake on her perch, and her phone keeps lighting up on the desk. Nothing in the actual story advances here — this is just the playable test area.
+        </div>
+
+        <div class="statgrid">
+          <div class="stat"><span class="tiny muted">MOOD</span><strong id="moodStat"></strong></div>
+          <div class="stat"><span class="tiny muted">ENERGY</span><strong id="energyStat"></strong></div>
+          <div class="stat"><span class="tiny muted">PHONE</span><strong id="batteryStat"></strong></div>
+          <div class="stat"><span class="tiny muted">OUTFIT</span><strong id="outfitStat"></strong></div>
+        </div>
+
+        <div class="action-grid">
+          <button class="action primary" data-action="phone">Check phone</button>
+          <button class="action" data-action="nirvana">Talk to Nirvana</button>
+          <button class="action" data-action="pack">Pack something into the trunk</button>
+          <button class="action" data-action="wardrobe">Change outfit</button>
+          <button class="action" data-action="time">Wait 15 minutes</button>
+        </div>
+
+        <form id="customForm" class="inputrow">
+          <input id="customAction" maxlength="180" placeholder="Type anything Maisie does…" autocomplete="off">
+          <button class="send" type="submit">Do</button>
+        </form>
+      </div>
+
+      <div class="grid cols2">
+        <div class="card">
+          <div class="section-head">
+            <strong>Current tasks</strong>
+            <span class="tiny muted" id="taskCount"></span>
+          </div>
+          <div id="taskList" class="grid"></div>
+        </div>
+
+        <div class="card">
+          <strong>Recent actions</strong>
+          <div class="log" id="actionLog"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="phone" class="screen">
+      <div class="panel">
+        <div class="section-head">
+          <div>
+            <div class="tiny muted">MAISIE'S PHONE</div>
+            <div class="scene-title" id="phoneClock"></div>
+          </div>
+          <span class="pill" id="phoneBatteryTop"></span>
+        </div>
+
+        <div id="phoneHome">
+          <div class="appgrid">
+            <button class="appbtn" data-app="messages">
+              <span class="ico">💬</span>Messages
+              <span id="msgBadge" class="badgeDot hidden">0</span>
+            </button>
+            <button class="appbtn" data-app="camera"><span class="ico">📷</span>Camera</button>
+            <button class="appbtn" data-app="photos"><span class="ico">🌄</span>Photos</button>
+            <button class="appbtn" data-app="notes"><span class="ico">📝</span>Notes</button>
+            <button class="appbtn" data-app="calendar"><span class="ico">📅</span>Calendar</button>
+            <button class="appbtn" data-app="contacts"><span class="ico">👤</span>Contacts</button>
+            <button class="appbtn" data-app="social"><span class="ico">🎵</span>Social</button>
+            <button class="appbtn" data-app="settings"><span class="ico">⚙️</span>RPG</button>
+          </div>
+        </div>
+
+        <div id="phoneView" class="hidden"></div>
+      </div>
+    </section>
+
+    <section id="bag" class="screen">
+      <div class="panel">
+        <div class="section-head">
+          <div class="scene-title">Inventory</div>
+          <span class="badge" id="inventoryCount"></span>
+        </div>
+        <div id="inventoryList" class="grid"></div>
+      </div>
+    </section>
+
+    <section id="people" class="screen">
+      <div class="panel">
+        <div class="scene-title">Relationships</div>
+        <div class="small muted page-note">
+          Numbers are visible only in this test build so you can see that interactions really change them.
+        </div>
+        <div id="relationshipList" class="grid"></div>
+      </div>
+    </section>
+
+    <section id="maisie" class="screen">
+      <div class="panel">
+        <div class="scene-title">Maisie Potter</div>
+        <div class="small muted">Age 11 • First Year • Story not started</div>
+
+        <div class="card2 block-gap">
+          <strong>Outfit</strong>
+          <div class="action-grid">
+            <button class="choice outfitBtn" data-outfit="Casual">Blue hoodie + black leggings</button>
+            <button class="choice outfitBtn" data-outfit="Day out">White top + jeans + trainers</button>
+            <button class="choice outfitBtn" data-outfit="Robes">Hogwarts robes</button>
+            <button class="choice outfitBtn" data-outfit="Sleepwear">Oversized sleep shirt</button>
+          </div>
+        </div>
+
+        <div class="card2 block-gap">
+          <strong>Character state</strong>
+          <div class="small state-lines">
+            <div>Mood: <span id="profileMood"></span></div>
+            <div>Energy: <span id="profileEnergy"></span></div>
+            <div>Current outfit: <span id="profileOutfit"></span></div>
+            <div>Known spells: 0</div>
+            <div>House: Not sorted yet</div>
+          </div>
+        </div>
+
+        <button class="action danger block-gap" id="resetGame">Reset this test build</button>
+      </div>
+    </section>
+  </main>
+
+  <nav class="nav" aria-label="Game navigation">
+    <button class="navbtn active" data-screen="play">Play</button>
+    <button class="navbtn" data-screen="phone">Phone <span id="navUnread" class="navUnread hidden"></span></button>
+    <button class="navbtn" data-screen="bag">Bag</button>
+    <button class="navbtn" data-screen="people">People</button>
+    <button class="navbtn" data-screen="maisie">Maisie</button>
+  </nav>
+</div>
+
+<div id="toast" class="toast hidden" role="status" aria-live="polite"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
