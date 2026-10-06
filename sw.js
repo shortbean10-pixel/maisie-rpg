@@ -1,5 +1,5 @@
 
-const CACHE="maisie-rpg-v09c";
+const CACHE="maisie-rpg-v11";
 const FILES=["./","./index.html","./styles.css","./app.js","./story.js","./campaign-engine.js","./campaign.js","./manifest.webmanifest","./icon.svg"];
 self.addEventListener("install",e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(FILES.map(url=>new Request(url,{cache:"reload"})))).then(()=>self.skipWaiting())));
 self.addEventListener("activate",e=>e.waitUntil(

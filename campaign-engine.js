@@ -1,12 +1,14 @@
 (()=>{
 "use strict";
-const copy=x=>JSON.parse(JSON.stringify(x)),cap=(n,a=0,b=100)=>Math.max(a,Math.min(b,n));
-const locations={home:"Potter home",alley:"Diagon Alley",platform:"Platform 9¾",train:"Hogwarts Express",lake:"Black Lake",common:"Gryffindor common room",hall:"Great Hall",library:"Library",courtyard:"Courtyard",owlery:"Owlery",charms:"Charms classroom",potions:"Potions classroom",grounds:"Flying grounds",alcove:"Upstairs alcove"};
+const copy=v=>JSON.parse(JSON.stringify(v));
+const clamp=(v,a=0,b=100)=>Math.max(a,Math.min(b,v));
+const locations={home:"The Dursleys’ house",alley:"Diagon Alley",platform:"Platform 9¾",train:"Hogwarts Express",lake:"Black Lake",hall:"Great Hall",common:"Gryffindor common room",library:"Library",courtyard:"Courtyard",owlery:"Owlery",charms:"Charms classroom",potions:"Potions classroom",grounds:"Flying grounds"};
+const people={Harry:["Your older brother.","A second-year Gryffindor."],Hagrid:["Hogwarts’ gamekeeper.","A friend of Harry’s."],Nirvana:["Your snowy owl.","You chose her name in the owl shop."],Draco:["A second-year Slytherin."],Hermione:["A second-year Gryffindor.","Often studies in the library."],Ron:["A second-year Gryffindor.","Knows Harry."],Petunia:["Your aunt.","You and Harry were raised in her house."],Vernon:["Your uncle.","You and Harry were raised in his house."]};
 const activities={
- charms:{title:"Charms lesson",place:"charms",time:50,energy:9,skill:"Charms",game:"wand",text:"A feather waits on your desk. Flitwick asks you to concentrate on the movement before trying the spell."},
+ charms:{title:"Charms lesson",place:"charms",time:50,energy:9,skill:"Charms",game:"wand",text:"A feather waits on your desk. Professor Flitwick asks you to concentrate on the movement before trying the spell."},
+ study:{title:"Study in the library",place:"library",time:30,energy:6,skill:"Knowledge",game:"memory",text:"You open your first-year notes. Matching the symbols might help the next lesson stick."},
  potions:{title:"Potions lesson",place:"potions",time:50,energy:9,skill:"Potions",game:"potion",text:"The instructions are on the board. Keep your cauldron steady and follow each step in order."},
  flying:{title:"Flying practice",place:"grounds",time:40,energy:12,skill:"Flying",game:"flying",text:"Madam Hooch sets out a low practice course. This is about control, not height."},
- study:{title:"Study in the library",place:"library",time:30,energy:6,skill:"Knowledge",game:"memory",text:"You open your first-year notes. Matching the symbols might help the next lesson stick."},
  explore:{title:"Explore the castle",place:"courtyard",time:25,energy:5,skill:"Exploration",text:"You follow a quieter staircase and find a route back to the courtyard. One less way to get lost."},
  owl:{title:"Visit Nirvana",place:"owlery",time:20,energy:3,skill:"Care",game:"owl",text:"Nirvana turns towards your footsteps. Fresh water, food, then a quiet moment together."},
  friends:{title:"Spend time with someone",place:"common",time:20,energy:3,skill:"Confidence",text:"The common room has a few spare seats. You can decide who to talk to."},
@@ -14,136 +16,40 @@ const activities={
  rest:{title:"Take a quiet break",place:"common",time:20,energy:-16,text:"You settle into an armchair. Nothing needs to happen for a few minutes."},
  practice:{title:"Practise a spell",place:"charms",time:20,energy:7,skill:"Charms",game:"wand",text:"You choose a clear space and a small practice object. Focus first; the spell can follow."}
 };
-const people={Harry:["Your older brother.","Second-year Gryffindor."],Draco:["A second-year Slytherin."],Hermione:["A second-year Gryffindor.","Often studies in the library."],Ron:["A second-year Gryffindor.","Knows Harry."],Mum:["Your mum."],Dad:["Your dad."],Nirvana:["Your snowy owl."]};
-function fresh(){return {version:9,started:false,day:0,minutes:600,location:"home",scene:"letter",energy:72,mood:80,battery:84,xp:0,house:"Not sorted yet",skills:{Charms:0,Potions:0,Flying:0,Knowledge:0,Exploration:0,Care:0,Confidence:0},spells:{Lumos:0,Leviosa:0},relations:{Harry:78,Mum:94,Dad:92,Nirvana:null,Draco:null,Hermione:null,Ron:null},facts:{Harry:copy(people.Harry),Mum:["Your mum."],Dad:["Your dad."],Nirvana:[],Draco:[],Hermione:[],Ron:[]},discovered:["home"],history:[],changes:[],daily:[],reviews:[],game:null,photo:false,unknown:"No unresolved messages in this new game.",outcome:"",reply:"",post:null,intro:0,introProgress:0,arcadeWins:0,inventory:["iPhone","Headphones","Blue hoodie"],visits:{},paused:false};}
-function date(s){if(s.day===0)return s.intro<5?"31 July":"1 September";const d=new Date(Date.UTC(2000,8,1));d.setUTCDate(d.getUTCDate()+s.day-1);return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][(s.day-1)%7]+" "+d.getUTCDate()+" "+["January","February","March","April","May","June","July","August","September","October","November","December"][d.getUTCMonth()];}
+function fresh(){return {version:11,started:false,day:0,minutes:600,location:"home",scene:"letter",energy:100,mood:75,battery:100,xp:0,house:"Not sorted yet",skills:{Charms:0,Potions:0,Transfiguration:0,Herbology:0,Astronomy:0,Defence:0,Flying:0,Knowledge:0,Exploration:0,Care:0,Confidence:0},personality:{Bravery:0,Kindness:0,Curiosity:0,Patience:0},spells:{Lumos:0,Leviosa:0},relations:{Harry:78,Hagrid:null,Nirvana:null,Draco:null,Hermione:null,Ron:null,Petunia:null,Vernon:null},facts:{Harry:copy(people.Harry),Hagrid:[],Nirvana:[],Draco:[],Hermione:[],Ron:[],Petunia:copy(people.Petunia),Vernon:copy(people.Vernon)},contacts:["Harry"],discovered:["home"],inventory:["iPhone","Headphones","Blue hoodie"],history:[],changes:[],daily:[],reviews:[],game:null,photo:false,unknown:"No unresolved messages in this new game.",outcome:"",reply:"",post:null,intro:0,introProgress:0,arcadeWins:0,visits:{},paused:false,storyStep:0,flags:{},messageEffects:[],messageKeys:[],dayStart:{xp:0,skills:{},personality:{}}};}
+function date(s){if(s.day===0){if(s.intro<2)return "31 July 1992";if(s.intro<5)return "1 August 1992";return "31 August 1992";}const d=new Date(Date.UTC(1992,8,1));d.setUTCDate(d.getUTCDate()+s.day);return ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][d.getUTCDay()]+" "+d.getUTCDate()+" September 1992";}
 function time(s){return String(Math.floor(s.minutes/60)%24).padStart(2,"0")+":"+String(s.minutes%60).padStart(2,"0");}
 function milestone(n){return ["Beginner","Developing","Steady","Skilled","Practised"][Math.min(4,Math.floor(n/100))];}
-function change(s,name,before,after,reason){if(before!==after)s.changes.push({name,amount:after-before,total:after,reason});}
-function stat(s,name,amount,reason){const before=s[name];s[name]=cap(before+amount);change(s,name,before,s[name],reason);}
-function gain(s,name,amount,reason){const before=s.skills[name]||0;s.skills[name]=before+amount;change(s,name,before,s.skills[name],reason);s.xp+=amount;}
-function spell(s,name,amount){const before=s.spells[name]||0;s.spells[name]=before+amount;change(s,name,before,s.spells[name],"Spell practice");}
-function relate(s,name,amount,reason){const before=s.relations[name];s.relations[name]=cap((before===null?50:before)+amount);change(s,name,before===null?50:before,s.relations[name],reason);}
-function log(s,text){s.history.unshift({day:s.day,time:time(s),text});s.history=s.history.slice(0,120);}
+function change(s,n,b,a,r){if(b!==a)s.changes.push({name:n,amount:a-b,total:a,reason:r});}
+function stat(s,n,a,r){const b=s[n];s[n]=clamp(b+a);change(s,n,b,s[n],r);}
+function gain(s,n,a,r){const b=s.skills[n]||0;s.skills[n]=b+a;s.xp+=a;change(s,n,b,s.skills[n],r);}
+function trait(s,n,a,r){const b=s.personality[n]||0;s.personality[n]=b+a;change(s,n,b,s.personality[n],r);}
+function spell(s,n,a){const b=s.spells[n]||0;s.spells[n]=b+a;change(s,n,b,s.spells[n],"Spell practice");}
+function relate(s,n,a,r){const b=s.relations[n];const old=b===null?50:b;s.relations[n]=old+a;change(s,n,old,s.relations[n],r);}
+function log(s,t){s.history.unshift({day:s.day,time:time(s),text:t});s.history=s.history.slice(0,120);}
 function move(s,id){if(!locations[id])return;s.location=id;if(!s.discovered.includes(id)){s.discovered.push(id);gain(s,"Exploration",5,"Discovered "+locations[id]);}}
-function beginGame(s,type,activity,spellName="Leviosa"){
- s.game={type,activity,spell:spellName,progress:0,selected:[],matched:[],flipped:[],attempts:0,complete:false,feedback:"",rewarded:false};
- s.scene="game";
-}
-function finishGame(s){const g=s.game;if(g.rewarded)return;g.complete=true;g.rewarded=true;
- if(g.arcade){s.arcadeWins++;s.outcome="Challenge complete! Your school-day progress hasn’t moved.";return;}
- const a=activities[g.activity];gain(s,a.skill,12,"Completed "+a.title.toLowerCase());
- if(g.type==="wand")spell(s,g.spell,8);
- if(g.type==="owl")relate(s,"Nirvana",2,"Cared for Nirvana");
- s.outcome={wand:g.spell==="Lumos"?"A small light holds at your wand tip. You let it fade before your focus slips.":"The feather rises and stays almost still. Keeping it steady still takes concentration.",potion:"The mixture settles to the colour in the instructions. Careful work pays off.",flying:"You finish the low course and land safely. Your turns feel a little smoother.",memory:"The last pair clicks into place. Your notes make a little more sense.",owl:"Nirvana settles beside you with a soft hoot."}[g.type];log(s,s.outcome);
-}
-function chooseGame(s,value){const g=s.game;if(!g||g.complete)return;g.feedback="";
- const sequences={wand:["Swish","Flick","Focus"],potion:["Low heat","Add nettles","Stir clockwise"],owl:["Water","Food","Quiet"],flying:["Lean left","Hold steady","Lean right","Land"]};
- if(g.type==="memory"){
-  const cards=["Owl","Train","Book","Wand","Train","Owl","Wand","Book"],i=Number(value);
-  if(value==="turn"){g.flipped=[];return;}
-  if(!Number.isInteger(i)||i<0||i>7||g.matched.includes(i)||g.flipped.includes(i))return;
-  if(g.flipped.length===2){g.feedback="Turn the two cards back first.";return;}
-  g.flipped.push(i);
-  if(g.flipped.length===2&&cards[g.flipped[0]]===cards[g.flipped[1]]){g.matched.push(...g.flipped);g.flipped=[];g.feedback="A match!";}
-  if(g.matched.length===8)finishGame(s);return;
- }
- const sequence=sequences[g.type];if(value===sequence[g.progress]){g.progress++;g.feedback="That’s it. "+g.progress+" of "+sequence.length+" steps.";}
- else{g.progress=0;g.attempts++;g.feedback="Try again from the first step. No progress or energy lost.";}
- if(g.progress===sequence.length)finishGame(s);
-}
-function act(s,id,value){
- s.changes=[];s.reply="";if(s.paused&&id!=="pause")return;
- if(id==="arcade"){
-  if(!["wand","potion","flying","memory","owl"].includes(value))return;
-  const previous=s.scene;beginGame(s,value,{wand:"practice",potion:"potions",flying:"flying",memory:"study",owl:"owl"}[value]);s.game.arcade=true;s.game.returnScene=previous;return;
- }
- if(id==="introGame"){
-  const seq=s.intro===2?["Breathe","Raise wand","Focus"]:s.intro===4?["Books","Robes","Headphones"]:null;
-  if(!seq)return;
-  if(value===seq[s.introProgress]){s.introProgress++;s.reply=s.introProgress===3?"All three steps done. Ready to move on.":"Good. Next step.";}else{s.introProgress=0;s.reply="Start again from the first step.";}return;
- }
- if(id==="start"){s.started=true;s.scene="letter";return;}
- if(id==="pause"){s.paused=!s.paused;return;}
- if(id==="intro"){
-  if(s.scene!=="letter")return;
-  s.intro++;s.introProgress=0;
-  s.reply={excited:"You read it twice, then race to find your family. Harry looks up with a grin. ‘Told you it would come.’",nervous:"You hold the letter carefully. Harry waits while you read. ‘You don’t have to know everything yet.’",calm:"You fold the letter and set it beside you. Hogwarts is real now. There is a lot to get ready."}[value]||"";
-  if(s.intro===2){move(s,"alley");s.minutes=660;}
-  if(s.intro===3){s.inventory.push("Blackthorn wand");gain(s,"Confidence",5,"Found your wand");}
-  if(s.intro===4){s.inventory.push("Nirvana’s carrier","First-year school books","Hogwarts robes");s.facts.Nirvana=["Your snowy owl.","Her name is Nirvana."];relate(s,"Nirvana",1,"Met Nirvana");}
-  if(s.intro===5){move(s,"platform");s.minutes=630;}
-  if(s.intro===6){move(s,"train");s.minutes=660;s.facts.Ron=copy(people.Ron);s.facts.Hermione=copy(people.Hermione);}
-  if(s.intro===7){move(s,"lake");s.minutes=1110;}
-  if(s.intro===8){move(s,"hall");s.minutes=1140;}
-  if(s.intro===9){s.house="Gryffindor";move(s,"common");s.minutes=1260;}
-  if(s.intro===10){s.day=2;s.minutes=480;s.scene="free";s.reply="Your first morning at Hogwarts. The day is yours to play.";}
-  log(s,"Moved on: "+["Letter","Family","Diagon Alley","Wand","Nirvana","Platform","Train","Lake","Sorting","Common room","First morning"][s.intro]);return;
- }
- if(id==="arrival"){
-  s.reply={greet:"‘Here!’ you call. Harry appears at the doorway. Draco sits up, leaving you room to decide what to do next.",leave:"You put your phone away and get up. ‘Coming.’ Harry waits outside while you gather your things.",stay:"‘Give me a minute,’ you tell Harry. He nods towards the corridor. Draco returns your phone without another comment."}[value];s.minutes+=3;s.scene="free";log(s,s.reply);return;
- }
- if(id==="activity"){
-  const a=activities[value];if(!a||s.day===0)return;
-  if(s.energy<Math.max(0,a.energy)){s.reply="You’re too tired for that right now. Eat, rest or sleep first.";return;}
-  if(s.minutes+a.time>1260&&a.energy>0){s.reply="It’s late. You can rest in the common room or go to bed; lessons can wait for tomorrow.";return;}
-  if(["charms","potions","flying"].includes(value)&&s.daily.includes(value)){s.reply="You’ve done that lesson today. Try spell practice, a break or another activity.";return;}
-  if(["charms","potions","flying"].includes(value)&&(s.day-1)%7>=5){s.reply="It’s the weekend. Try personal practice, exploring or time with friends.";return;}
-  move(s,a.place);s.minutes=Math.min(1439,s.minutes+a.time);stat(s,"energy",-a.energy,a.title);if(!s.daily.includes(value))s.daily.push(value);
-  s.outcome=a.text;s.visits[value]=(s.visits[value]||0)+1;
-  if(a.game){beginGame(s,a.game,value);return;}
-  if(a.skill)gain(s,a.skill,5,a.title);
-  if(value==="friends")s.scene="friends";
-  else{s.scene="result";log(s,a.text);}
-  return;
- }
- if(id==="spell"){if(value in s.spells&&s.game?.type==="wand"&&!s.game.progress&&!s.game.complete)s.game.spell=value;return;}
- if(id==="game"){chooseGame(s,value);return;}
- if(id==="skipGame"){if(s.game?.arcade){s.scene=s.game.returnScene;s.game=null;return;}s.outcome="You watch the demonstration and keep the steps in mind for next time.";s.game=null;s.scene="result";log(s,s.outcome);return;}
- if(id==="continue"){s.scene=s.game?.arcade?s.game.returnScene:"free";s.game=null;return;}
- if(id==="friend"){
-  if(!Object.hasOwn(s.relations,value))return;
-  if(!s.facts[value]?.length)s.facts[value]=copy(people[value]);
-  s.person=value;s.scene="dialogue";return;
- }
- if(id==="talk"){
-  const name=s.person||"Harry";
-  if(value==="kind"){relate(s,name,2,"Listened to "+name);gain(s,"Confidence",3,"A conversation");s.outcome=name+" listens while you talk about the day. The conversation feels a little easier.";
-   if(!s.facts[name].includes("You have shared a conversation about your school day."))s.facts[name].push("You have shared a conversation about your school day.");}
-  if(value==="tease"){relate(s,name,-1,"A joke landed awkwardly");s.outcome="The joke lands awkwardly. You change the subject and give "+name+" some space.";}
-  if(value==="class"){gain(s,"Knowledge",4,"Compared lesson notes");s.outcome="You compare the parts of the lesson you found difficult. One small tip gives you something to try next time.";}
-  s.minutes=Math.min(1439,s.minutes+10);s.scene="result";log(s,s.outcome);return;
- }
- if(id==="travel"){if(!locations[value]||s.day===0)return;move(s,value);s.minutes=Math.min(1439,s.minutes+10);stat(s,"energy",-2,"Walked to "+locations[value]);s.scene="free";s.reply="You arrive at "+locations[value]+".";return;}
- if(id==="sleep"){
-  if(s.day===0){s.reply="Finish getting to Hogwarts first.";return;}
-  const review={day:s.day,date:date(s),xp:s.xp,energy:s.energy,skills:copy(s.skills),spells:copy(s.spells),activities:[...s.daily],weekly:s.day%7===0};
-  s.reviews.unshift(review);s.reviews=s.reviews.slice(0,30);s.scene="review";return;
- }
- if(id==="morning"){
-  s.day++;s.minutes=480;s.daily=[];s.location="common";stat(s,"energy",100-s.energy,"A full night’s sleep");stat(s,"battery",100-s.battery,"Charged overnight");stat(s,"mood",3,"Fresh morning");s.scene="free";s.reply="A new day begins. Choose your first activity.";log(s,"Started "+date(s));return;
- }
- if(id==="post"){
-  s.post={id:"post-"+Date.now(),text:String(value).slice(0,180)};s.outcome="Your status is saved to the in-game Social feed.";s.scene="result";log(s,"Posted: "+s.post.text);return;
- }
- if(id==="text"){
-  const text=String(value).trim().slice(0,240),t=text.toLowerCase();if(!text)return;
-  if(/^(sleep|go to bed|end (the )?day)/.test(t))return act(s,"sleep");
-  if(/^(rest|relax|take a break)/.test(t))return act(s,"activity","rest");
-  if(/^(eat|breakfast|lunch|dinner)/.test(t))return act(s,"activity","meal");
-  if(/^(study|read|homework)/.test(t))return act(s,"activity","study");
-  if(/^(explore|walk around)/.test(t))return act(s,"activity","explore");
-  if(/^(visit|feed|care for).*nirvana/.test(t))return act(s,"activity","owl");
-  if(/^(cast|practi[sc]e).*\b(lumos|leviosa|spell)\b/.test(t)){act(s,"activity","practice");if(s.game)s.game.spell=/lumos/.test(t)?"Lumos":"Leviosa";return;}
-  const course=Object.keys(activities).find(a=>["charms","potions","flying"].includes(a)&&t.includes(a));if(course)return act(s,"activity",course);
-  const person=Object.keys(s.relations).find(n=>t.includes(n.toLowerCase()));
-  if(person&&/^(talk|chat|sit|meet)/.test(t)){act(s,"activity","friends");if(s.scene==="friends")act(s,"friend",person);return;}
-  const place=Object.keys(locations).find(k=>t.includes(locations[k].toLowerCase()));if(place&&/^(go|walk|visit|head)/.test(t))return act(s,"travel",place);
-  if(/^post\s+/.test(t))return act(s,"post",text.replace(/^post\s+/i,""));
-  if(s.scene==="arrival"&&/^(hi|hello|here|coming|leave)/.test(t))return act(s,"arrival",/leave|coming/.test(t)?"leave":"greet");
-  s.reply="I haven’t turned that into a game action. Try ‘practise Lumos’, ‘go to the library’, ‘talk to Harry’, ‘eat’, ‘sleep’, or pick an option below. Nothing changed.";
- }
-}
-const api={fresh,act,date,time,milestone,locations,activities,people,copy};
-if(typeof module!=="undefined"&&module.exports)module.exports=api;else window.CampaignEngine=api;
+function meet(s,n){if(!s.facts[n]?.length)s.facts[n]=copy(people[n]||[]);if(n!=="Nirvana"&&!s.contacts.includes(n))s.contacts.push(n);}
+function introSequence(s){const seq=["The letter","The family room","Diagon Alley","The wand shop","The owl shop","Packing night","Platform 9¾","The Hogwarts Express","Across the lake","The Sorting","Gryffindor tower"];return {title:seq[Math.min(s.intro,seq.length-1)],location:s.location};}
+function chapter(s){const steps=[
+ {title:"Finding your feet",person:"Harry",place:"common",speech:s.flags.harryReassurance?"I remember what you said. We can find the classroom together. You only have to do the first small thing.":"First lesson today. I can show you the Charms corridor before I go to my own class.",text:"Harry is waiting beside the common-room portrait. Your timetable is folded in your pocket.",next:"Walk to Charms with Harry"},
+ {title:"Your first Charms lesson",person:"Professor Flitwick",place:"charms",speech:s.flags.firstCharm?"Good. A little lift is a beginning, not the end of practice. Write down what helped you.":"A careful movement, then a clear word. Let us begin with the feather on your desk.",text:s.flags.firstCharm?"The lesson ends with a small success to remember.":"Harry leaves for his second-year lesson. You take a seat among the first years.",activity:"charms",done:!!s.flags.firstCharm,next:"Take your notes to the library"},
+ {title:"After the lesson",person:s.flags.studyPlan?"Hermione":"The librarian",place:"library",speech:s.flags.studyPlan?"You asked for help, so I brought my notes. Show me which part was awkward.":"First-year books are along that shelf. Keep your voices low.",text:s.flags.studyPlan?"Hermione pulls out the chair beside her. Your message has turned into a chance to practise together.":"You find a quiet desk and open your own notes.",activity:"study",done:!!s.flags.firstStudy,next:"Finish the day"},
+ {title:"A quiet evening",person:"Harry",place:"common",speech:s.flags.trainPlan==="quiet"?"I remember you wanted some quiet. I’ll check in when you want me to.":"You made it through your first lessons. Tomorrow will have its own problems.",text:"The common room settles around you. You can sleep when you are ready.",requiresSleep:true,next:"Sleep and begin tomorrow"},
+ {title:"Following the recipe",person:"Professor Snape",place:"potions",speech:s.flags.firstPotion?"An orderly bench and a finished mixture. Keep the same care next time.":"Read every instruction before touching the cauldron. Guesswork is not a method.",text:"The next morning brings Potions. Yesterday’s practice helps you slow down and check each step.",activity:"potions",done:!!s.flags.firstPotion,next:"Take a break in the courtyard"},
+ {title:"A conversation between lessons",person:"Draco",place:"courtyard",speech:s.flags.spaceDraco?"I’ll leave you to it. You said you wanted space.":s.flags.apologyDraco?"I read your apology. We can start again, if you want.":"First week? You look as though you’ve been carrying every book you own.",text:"A second-year Slytherin stands near the courtyard wall. You can speak, set a boundary, or carry on.",conversation:true,next:"Visit the owlery"},
+ {title:"A quiet visit",person:"Hagrid",place:"owlery",speech:"There she is. Looks like Nirvana knows your footsteps already. Water first, then food, and don’t rush her.",text:"You follow the stairs to the owlery. Your schoolwork can wait for a quiet moment with Nirvana.",activity:"owl",done:!!s.flags.firstOwl,next:"Make a plan for tomorrow"}
+];if(s.storyStep<steps.length)return steps[s.storyStep];const cycle=["charms","study","potions","explore","flying","owl","rest"];const activity=cycle[(s.day-2)%cycle.length];return {title:"Making Hogwarts familiar",person:"Harry",place:"common",speech:"What are you working on today? Tell me about it when we meet after lessons.",text:"The things you practise, the people you make time for and the plans you keep are becoming your own school story.",activity,done:s.daily.includes(activity),next:"Keep playing this day"};}
+function beginGame(s,type,activity,arcade=false){s.game={type,activity,spell:"Lumos",progress:0,matched:[],flipped:[],attempts:0,complete:false,feedback:"",rewarded:false,arcade,returnScene:s.scene};s.scene="game";}
+function finishGame(s){const g=s.game;if(!g||g.rewarded)return;g.complete=true;g.rewarded=true;if(g.arcade){s.arcadeWins++;s.outcome="Challenge complete. Your school-day progress stays where it was.";return;}const a=activities[g.activity];if(a?.skill)gain(s,a.skill,12,"Completed "+a.title.toLowerCase());trait(s,"Patience",g.attempts?2:1,"Finished practice");if(g.type==="wand")spell(s,g.spell,8);if(g.activity==="charms")s.flags.firstCharm=true;if(g.activity==="study")s.flags.firstStudy=true;if(g.activity==="potions")s.flags.firstPotion=true;if(g.activity==="owl"){s.flags.firstOwl=true;relate(s,"Nirvana",2,"Cared for Nirvana");}s.outcome={wand:g.spell==="Lumos"?"A small light holds at your wand tip. You let it fade before your focus slips.":"The feather rises and stays almost still. Keeping it steady still takes concentration.",potion:"The mixture settles to the colour in the instructions. Careful work pays off.",flying:"You finish the low course and land safely. Your turns feel a little smoother.",memory:"The last pair clicks into place. Your notes make a little more sense.",owl:"Nirvana settles beside you with a soft hoot."}[g.type];log(s,s.outcome);}
+function chooseGame(s,v){const g=s.game;if(!g||g.complete)return;g.feedback="";const seqs={wand:["Swish","Flick","Focus"],potion:["Low heat","Add nettles","Stir clockwise"],owl:["Water","Food","Quiet"],flying:["Lean left","Hold steady","Lean right","Land"]};if(g.type==="memory"){const cards=["Owl","Train","Book","Wand","Train","Owl","Wand","Book"],i=Number(v);if(v==="turn"){g.flipped=[];return;}if(!Number.isInteger(i)||i<0||i>7||g.matched.includes(i)||g.flipped.includes(i))return;if(g.flipped.length===2){g.feedback="Turn the two cards back first.";return;}g.flipped.push(i);if(g.flipped.length===2&&cards[g.flipped[0]]===cards[g.flipped[1]]){g.matched.push(...g.flipped);g.flipped=[];g.feedback="A match!";}if(g.matched.length===8)finishGame(s);return;}const seq=seqs[g.type];if(v===seq[g.progress]){g.progress++;g.feedback="That’s it. "+g.progress+" of "+seq.length+" steps.";}else{g.progress=0;g.attempts++;g.feedback="Try again from the first step. No progress or energy lost.";}if(g.progress===seq.length)finishGame(s);}
+function message(s,name,text){s.changes=[];if(s.paused)return {accepted:false,reply:"Resume your story before sending a message."};if(!s.contacts.includes(name))return {accepted:false,reply:"You don’t have this contact yet."};const t=String(text).trim().toLowerCase().slice(0,240);if(!t)return {accepted:false,reply:"Write a message first."};let kind="chat",reply="I’ll listen when we next see each other.",effect="";const negative=/\b(don’t|don't|do not|not|no|cancel)\b/.test(t);if(/leave me alone|give me (?:some )?space|need some space|don’t want to talk|don't want to talk/.test(t)){kind="space";s.flags["space"+name]=true;reply="Okay. I’ll give you some space.";effect=name+" will let you decide when to speak next.";}else if(/sorry|apologi[sz]e/.test(t)){kind="apology";s.flags["space"+name]=false;s.flags["apology"+name]=true;reply="Thanks for saying that. We can talk when I see you.";effect="Your apology will be acknowledged in person.";}else if(name==="Harry"&&/nervous|scared|worried|afraid|reassur/.test(t)){kind="reassurance";s.flags.harryReassurance=true;reply="I hear you. We’ll take it one thing at a time. I’ll come and talk to you.";effect="Harry will make time for a reassuring conversation.";}else if(name==="Harry"&&/train|compartment|window seat/.test(t)){kind="train";s.flags.trainPlan=/alone|quiet|space/.test(t)?"quiet":negative?"none":"together";reply=s.flags.trainPlan==="quiet"?"I’ll find you a quiet window seat. Come and get me when you want company.":s.flags.trainPlan==="none"?"Okay, no seat plan. We can decide at the station.":"I’ll save you a seat with us. Meet me beside the carriage door.";effect="Your train plan has changed.";}else if(name==="Hermione"&&/help|study|library|notes|homework|practice|practise/.test(t)){kind="study";s.flags.studyPlan=!negative;reply=negative?"Of course. I’ll leave you to it. Ask if you change your mind.":"Meet me in the library when you’re ready. Bring your notes.";effect=negative?"You will study independently.":"Hermione will bring notes to your next study scene.";}else if(/meet|see you|sit with|lunch|courtyard/.test(t)&&s.day>0){kind="meeting";s.flags.meeting=negative?null:{name,place:/library/.test(t)?"library":/lunch|food|hall/.test(t)?"hall":"courtyard"};reply=negative?"Okay, cancelled. Catch you another time.":"All right. Come find me when you’re ready.";effect=negative?"The meeting is cancelled.":"A meeting is available in your story choices.";}else if(/idiot|shut up|hate you/.test(t)){kind="rude";s.flags["space"+name]=true;reply="I’m leaving this conversation for now.";effect="They will be more guarded next time.";}const key=name+":"+kind+":"+(s.day||s.intro)+":"+(kind==="train"?s.flags.trainPlan:kind==="study"?s.flags.studyPlan:"");if(!s.messageKeys.includes(key)){s.messageKeys.push(key);if(kind==="apology"){relate(s,name,2,"An apology by message");trait(s,"Kindness",1,"Took responsibility");}if(kind==="reassurance")trait(s,"Bravery",1,"Asked for support");if(kind==="rude")relate(s,name,-3,"A hurtful message");}if(effect){s.messageEffects.unshift({name,effect,day:s.day,time:time(s)});s.messageEffects=s.messageEffects.slice(0,20);log(s,"Phone: "+effect);}stat(s,"battery",-1,"Sent a message");return {accepted:true,reply,effect:effect||"Delivered. No new plan was made."};}
+function action(s,id,v){s.changes=[];s.reply="";if(s.paused&&id!=="pause")return;if(id==="arcade"){if(["wand","potion","flying","memory","owl"].includes(v))beginGame(s,v,{wand:"practice",potion:"potions",flying:"flying",memory:"study",owl:"owl"}[v],true);return;}if(id==="introGame"){const seq=s.intro===3?["Breathe","Raise wand","Focus"]:s.intro===5?["Books","Robes","Headphones"]:null;if(!seq)return;if(v===seq[s.introProgress]){s.introProgress++;s.reply=s.introProgress===seq.length?"All three steps done. Ready to move on.":"Good. Next step.";}else{s.introProgress=0;s.reply="Start again from the first step.";}return;}if(id==="start"){s.started=true;s.scene="letter";return;}if(id==="pause"){s.paused=!s.paused;return;}
+if(id==="intro"){if(s.scene!=="letter")return;const p=s.intro;if((p===3||p===5)&&s.introProgress<3){s.reply="Finish the mini game before moving on.";return;}s.intro++;s.introProgress=0;if(p===0){s.inventory.push("Hogwarts letter");trait(s,"Curiosity",1,"Opened Hedwig’s letter");}if(p===1){move(s,"alley");s.minutes=660;}if(p===3){s.inventory.push("Blackthorn wand");gain(s,"Confidence",5,"Found your wand");}if(p===4){s.inventory.push("Nirvana’s carrier","First-year school books","Hogwarts robes");s.facts.Nirvana=copy(people.Nirvana);relate(s,"Nirvana",1,"Met Nirvana");move(s,"home");s.minutes=1200;}if(p===5){move(s,"platform");s.minutes=630;}if(p===6){move(s,"train");s.minutes=660;meet(s,"Ron");meet(s,"Hermione");}if(p===7){move(s,"lake");s.minutes=1110;}if(p===8){move(s,"hall");s.minutes=1140;}if(p===9){s.house="Gryffindor";move(s,"common");s.minutes=1260;}if(p===10){s.day=1;s.minutes=480;s.scene="chapter";s.storyStep=0;s.dayStart={xp:s.xp,skills:copy(s.skills),personality:copy(s.personality)};s.reply="Your first morning at Hogwarts. The day is yours to play.";}log(s,"Moved on from "+introSequence(s).title);return;}
+if(id==="story"){if(!s.day){s.scene="letter";return;}if(s.flags.meeting){s.scene="meeting";return;}s.scene="chapter";return;}if(id==="storyNext"){const c=chapter(s);if(c.requiresSleep){s.reply="You can end the day here, or use the Hub for anything you still want to do.";return;}if(c.activity&&!c.done){s.reply="Try the scene’s activity or watch the demonstration before moving on.";return;}if(c.conversation){s.scene="conversation";return;}if(s.storyStep<6){s.storyStep++;s.scene="chapter";return;}s.storyStep=7;s.scene="free";return;}if(id==="storySleep")return action(s,"sleep");if(id==="storyTalk"){if(s.storyStep!==5)return;if(v==="friendly"){meet(s,"Draco");relate(s,"Draco",2,"A friendly introduction in the courtyard");trait(s,"Kindness",1,"Made room for a new conversation");s.flags.spaceDraco=false;s.reply="‘Maisie,’ you say. He gives his name in return. ‘See you around, then.’";}else if(v==="boundary"){meet(s,"Draco");s.flags.spaceDraco=true;trait(s,"Bravery",1,"Set a boundary");s.reply="‘I’d like some quiet,’ you tell him. He steps aside. ‘All right.’";}else s.reply="You nod and carry on towards the stairs.";s.storyStep=6;s.scene="result";s.outcome=s.reply;log(s,s.reply);return;}if(id==="meeting"){const m=s.flags.meeting;if(!m){s.scene="free";return;}move(s,m.place);meet(s,m.name);s.person=m.name;s.flags.meeting=null;s.scene="conversation";log(s,"Kept a meeting arranged by phone with "+s.person);return;}
+if(id==="demo"){action(s,"activity",v);if(s.game)action(s,"skipGame");return;}if(id==="activity"){const a=activities[v];if(!a||s.day===0)return;if(s.energy<Math.max(0,a.energy)){s.reply="You’re too tired for that right now. Eat, rest or sleep first.";return;}if(["charms","potions","flying"].includes(v)&&s.daily.includes(v)){s.reply="You’ve done that lesson today. Try practice, a break or another activity.";return;}move(s,a.place);s.minutes=Math.min(1439,s.minutes+a.time);stat(s,"energy",-a.energy,a.title);if(!s.daily.includes(v))s.daily.push(v);s.outcome=a.text;s.visits[v]=(s.visits[v]||0)+1;if(a.game){beginGame(s,a.game,v);return;}if(a.skill)gain(s,a.skill,5,a.title);if(v==="explore")trait(s,"Curiosity",2,"Explored a new route");if(v==="friends")s.scene="friends";else{s.scene="result";log(s,a.text);}return;}
+if(id==="spell"){if(v in s.spells&&s.game?.type==="wand"&&!s.game.progress&&!s.game.complete)s.game.spell=v;return;}if(id==="game"){chooseGame(s,v);return;}if(id==="skipGame"){if(!s.game&&s.scene==="chapter"){const a=chapter(s).activity;if(a)return action(s,"demo",a);}if(s.game&&!s.game.arcade){const f={charms:"firstCharm",study:"firstStudy",potions:"firstPotion",owl:"firstOwl"}[s.game.activity];if(f)s.flags[f]=true;}if(s.game?.arcade){s.scene=s.game.returnScene;s.game=null;return;}s.outcome="You watch the demonstration and keep the steps in mind for next time.";s.game=null;s.scene="result";log(s,s.outcome);return;}if(id==="continue"){if(s.game?.arcade)s.scene=s.game.returnScene;else if(s.day&&s.storyStep>=7)s.scene="free";else s.scene=s.day?"chapter":"letter";s.game=null;return;}
+if(id==="friend"){if(!Object.hasOwn(s.relations,v))return;meet(s,v);s.person=v;s.scene="conversation";return;}if(id==="talk"){const n=s.person||"Harry";if(v==="kind"){trait(s,"Kindness",1,"Listened in person");relate(s,n,2,"Listened to "+n);gain(s,"Confidence",3,"A conversation");s.outcome=n+" listens while you talk about the day. The conversation feels a little easier.";}if(v==="tease"){relate(s,n,-1,"A joke landed awkwardly");s.outcome="The joke lands awkwardly. You change the subject and give "+n+" some space.";}if(v==="class"){gain(s,"Knowledge",4,"Compared lesson notes");s.outcome="You compare the parts of the lesson you found difficult. One small tip gives you something to try next time.";}s.minutes=Math.min(1439,s.minutes+10);s.scene="result";log(s,s.outcome);return;}if(id==="travel"){if(!locations[v]||s.day===0)return;move(s,v);s.minutes=Math.min(1439,s.minutes+10);stat(s,"energy",-2,"Walked to "+locations[v]);s.scene="free";s.reply="You arrive at "+locations[v]+".";return;}
+if(id==="sleep"){if(s.day===0){s.reply="Finish getting to Hogwarts first.";return;}const r={day:s.day,date:date(s),xp:s.xp,energy:s.energy,skills:copy(s.skills),spells:copy(s.spells),personality:copy(s.personality),activities:[...s.daily],weekly:s.day%7===0};s.reviews.unshift(r);s.reviews=s.reviews.slice(0,30);s.scene="review";return;}if(id==="morning"){s.day++;s.minutes=480;s.daily=[];s.location="common";stat(s,"energy",100-s.energy,"A full night’s sleep");stat(s,"battery",100-s.battery,"Charged overnight");stat(s,"mood",3,"Fresh morning");s.storyStep=s.day===2?4:7;s.scene="chapter";s.dayStart={xp:s.xp,skills:copy(s.skills),personality:copy(s.personality)};s.reply="A new day begins. Your story continues from the plans you made.";log(s,"Started "+date(s));return;}
+if(id==="post"){s.post={id:"post-"+Date.now(),text:String(v).slice(0,180)};s.outcome="Your status is saved to the in-game Social feed.";s.scene="result";log(s,"Posted: "+s.post.text);return;}if(id==="text"){const text=String(v).trim().slice(0,240),t=text.toLowerCase();if(!text)return;if(/^(sleep|go to bed|end (the )?day)/.test(t))return action(s,"sleep");if(/^(rest|relax|take a break)/.test(t))return action(s,"activity","rest");if(/^(eat|breakfast|lunch|dinner)/.test(t))return action(s,"activity","meal");if(/^(study|read|homework)/.test(t))return action(s,"activity","study");if(/^(explore|walk around)/.test(t))return action(s,"activity","explore");if(/^(visit|feed|care for).*nirvana/.test(t))return action(s,"activity","owl");if(/^(cast|practi[sc]e).*\b(lumos|leviosa|spell)\b/.test(t)){action(s,"activity","practice");if(s.game)s.game.spell=/lumos/.test(t)?"Lumos":"Leviosa";return;}const course=["charms","potions","flying"].find(n=>t.includes(n));if(course)return action(s,"activity",course);const person=Object.keys(s.relations).find(n=>t.includes(n.toLowerCase()));if(person&&/^(talk|chat|sit|meet)/.test(t)){action(s,"activity","friends");if(s.scene==="friends")action(s,"friend",person);return;}const place=Object.keys(locations).find(k=>t.includes(locations[k].toLowerCase()));if(place&&/^(go|walk|visit|head)/.test(t))return action(s,"travel",place);if(/^post\s+/.test(t))return action(s,"post",text.replace(/^post\s+/i,""));s.reply="I haven’t turned that into a game action. Try ‘practise Lumos’, ‘go to the library’, ‘talk to Harry’, ‘eat’, ‘sleep’, or choose a scene option. Nothing changed.";}}
+const api={fresh,action,message,date,time,milestone,locations,activities,people,chapter,introSequence,copy};if(typeof module!=="undefined"&&module.exports)module.exports=api;else window.CampaignEngine=api;
 })();

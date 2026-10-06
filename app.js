@@ -258,6 +258,8 @@ function advanceTime(mins){
   renderAll();
 }
 function maybeIncomingMessages(){
+  if(state.campaignActive)return;
+  if(!state.messages.Mum||!state.messages.Harry)return;
   if(state.minutes>=1230 && !state.messages.Mum.some(m=>m.text.includes("nearly finished"))){
     incoming("Mum","Are you nearly finished packing? x");
   }
@@ -284,7 +286,7 @@ function renderChatList(){
   const list=$("#chatList");
   if(!list)return;
   list.innerHTML="";
-  ["Harry","Mum","Dad","Family"].forEach(name=>{
+  Object.keys(state.messages).forEach(name=>{
     const msgs=state.messages[name]||[];
     const last=msgs[msgs.length-1]||{text:""};
     const unread=state.unread[name]||0;
@@ -302,6 +304,8 @@ function renderChatList(){
 }
 function openChat(name){
   currentChat=name;
+  if(!state.messages[name])state.messages[name]=[];
+  if(!state.unread[name])state.unread[name]=0;
   state.unread[name]=0;
   save();
   renderHUD();
@@ -344,9 +348,11 @@ function openChat(name){
     }
 
     addLog("Messaged "+name+".");
+    const messageDetail={name,text:v};
+    document.dispatchEvent(new CustomEvent("phone-message",{detail:messageDetail}));
     renderAll();
     renderChat(name);
-    queueReply(name,v);
+    queueReply(name,v,messageDetail.result?.reply);
   });
 }
 function renderChat(name){
@@ -364,13 +370,13 @@ function renderChat(name){
   });
   box.scrollTop=box.scrollHeight;
 }
-function queueReply(name,text){
+function queueReply(name,text,campaignReply){
   clearTimeout(replyTimer);
   const line=$("#typingLine");
   if(line)line.classList.remove("hidden");
 
   replyTimer=setTimeout(()=>{
-    const reply=generateReply(name,text);
+    const reply=campaignReply||generateReply(name,text);
     const payload={from:"them",text:reply,time:timeString()};
     if(name==="Family")payload.sender=["Harry","Mum","Dad"][Math.floor(Math.random()*3)];
 
@@ -589,6 +595,34 @@ async function takeCameraPhoto(){
   }
 }
 
+async function importCameraPhoto(file){
+  if(!file||!file.type.startsWith("image/")){
+    if(file)toast("Choose an image from the camera roll.");
+    return;
+  }
+  const reader=new FileReader();
+  reader.onload=async()=>{
+    const record={
+      id:"upload-"+Date.now(),
+      type:"camera",
+      label:"Camera roll "+timeString(),
+      data:reader.result
+    };
+    try{
+      await photoPut(record);
+      state.battery=clamp(state.battery-1,0,100);
+      save();
+      renderHUD();
+      addLog("Uploaded a photo from the camera roll.");
+      toast("Photo saved to Photos.");
+    }catch{
+      toast("Couldn’t save that photo.");
+    }
+  };
+  reader.onerror=()=>toast("Couldn’t read that photo.");
+  reader.readAsDataURL(file);
+}
+
 function setupCameraUI(){
   $("#startCamera").addEventListener("click",startCamera);
   $("#flipCamera").addEventListener("click",async()=>{
@@ -597,6 +631,10 @@ function setupCameraUI(){
     await startCamera();
   });
   $("#shutter").addEventListener("click",takeCameraPhoto);
+  $("#cameraRollInput").addEventListener("change",e=>{
+    importCameraPhoto(e.target.files?.[0]);
+    e.target.value="";
+  });
 }
 
 function openPhoneApp(app){
@@ -627,6 +665,10 @@ function openPhoneApp(app){
         <button class="shutter" id="shutter" aria-label="Take photo" disabled></button>
         <button class="mini" id="startCamera">Start camera</button>
       </div>
+      <div class="cameraUploadRow">
+        <label class="mini camera-roll-label" for="cameraRollInput">Upload from camera roll</label>
+        <input id="cameraRollInput" type="file" accept="image/*" hidden>
+      </div>
       <canvas id="cameraCanvas" class="hidden"></canvas>
       <div id="cameraStatus" class="tiny muted" style="text-align:center;margin-top:7px"></div>
     </div>`;
@@ -652,11 +694,7 @@ function openPhoneApp(app){
   }else if(app==="contacts"){
     html+=`<div class="card2" style="margin-top:10px">
       <strong>Contacts</strong>
-      <div class="grid" style="margin-top:8px">
-        <button class="chatrow quickChat" data-name="Harry"><span class="avatar">H</span><span><strong>Harry</strong><span class="small muted" style="display:block">Brother</span></span></button>
-        <button class="chatrow quickChat" data-name="Mum"><span class="avatar">M</span><span><strong>Mum</strong><span class="small muted" style="display:block">Mum ❤️</span></span></button>
-        <button class="chatrow quickChat" data-name="Dad"><span class="avatar">D</span><span><strong>Dad</strong><span class="small muted" style="display:block">Dad</span></span></button>
-      </div>
+      <div class="grid" style="margin-top:8px" id="contactList"></div>
     </div>`;
   }else if(app==="social"){
     html+=`<div class="card2" style="margin-top:10px">
@@ -676,7 +714,7 @@ function openPhoneApp(app){
       <div class="switchRow"><span>Show relationship numbers</span><button class="toggle ${state.settings.showRelationshipNumbers?'on':''}" data-setting="showRelationshipNumbers"><span></span></button></div>
       <div class="switchRow"><span>Sound effects</span><button class="toggle ${state.settings.sound?'on':''}" data-setting="sound"><span></span></button></div>
       <button class="mini" data-open-stats style="margin-top:10px">My Stats</button>
-      <div class="small muted" style="margin-top:10px">Story: Day-by-day • Build 0.9</div>
+      <div class="small muted" style="margin-top:10px">Story: Day-by-day • Build 1.0</div>
     </div>`;
   }
 
@@ -685,10 +723,12 @@ function openPhoneApp(app){
     state.campaignPosts.slice(0,15).forEach(post=>{const d=document.createElement("div");d.className="card2 block-gap";d.textContent="@maisie · "+post.text;view.appendChild(d);});
   }
   if(app==="contacts"){
-    const list=view.querySelector(".grid");
-    Object.keys(state.messages).filter(n=>!["Harry","Mum","Dad","Family"].includes(n)).forEach(name=>{
+    const list=view.querySelector("#contactList");
+    Object.keys(state.messages).forEach(name=>{
       const b=document.createElement("button");b.className="chatrow quickChat";b.dataset.name=name;
-      b.textContent=name;list.appendChild(b);
+      const avatar=name==="Family"?"👨‍👩‍👧‍👦":name[0]||"?";
+      b.innerHTML=`<span class="avatar">${avatar}</span><span><strong>${escapeHtml(name)}</strong><span class="small muted" style="display:block">${name==="Harry"?"Brother":name==="Family"?"Group chat":"Contact"}</span></span>`;
+      list.appendChild(b);
     });
   }
   const statsButton=view.querySelector("[data-open-stats]");
@@ -829,8 +869,8 @@ document.addEventListener("campaign-sync",e=>{
   syncingCampaign=true;
   const p=e.detail;
   if(p.reset){state=clone(defaults);state.photos=state.photos.filter(x=>x.id!=="draco-selfie");state.packed=[];
-    state.messages={Harry:[{from:"them",text:"you got your letter! keep the school list",time:"09:56"}],Mum:[{from:"them",text:"Keep your supply list safe lovely x",time:"09:57"}],Dad:[{from:"them",text:"We’ll get everything you need 👍",time:"09:58"}],Family:[]};
-    state.unread={Harry:1,Mum:1,Dad:1,Family:0};
+    state.messages={Harry:[{from:"them",text:"You got your letter? Tell me when you read it.",time:"09:56"}]};
+    state.unread={Harry:1};
   }
   state.campaignActive=true;
   state.relationships={...p.relations};
@@ -839,7 +879,7 @@ document.addEventListener("campaign-sync",e=>{
   if(p.intro<4)state.photos=state.photos.filter(x=>x.id!=="seed-nirvana");
   state.minutes=p.minutes;state.date=p.date;state.location=p.location;
   state.energy=p.energy;state.mood=p.mood;state.battery=p.battery;
-  if(p.started)state.tasks=p.tasks.map(t=>({id:t.id,label:t.label,done:t.done}));
+  if(p.tasks)state.tasks=p.tasks.map(t=>({id:t.id,label:t.label,done:t.done}));
   for(const name of p.contacts){
     if(!state.messages[name])state.messages[name]=[];
     if(state.unread[name]==null)state.unread[name]=0;
